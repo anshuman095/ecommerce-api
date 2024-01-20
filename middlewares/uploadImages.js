@@ -1,12 +1,10 @@
 const multer = require("multer");
 const sharp = require("sharp");
-const path = require("path"); // We are going to first store or images in our local after that we will upload to the cloud
+const path = require("path");
 const fs = require("fs");
 
 const multerStorage = multer.diskStorage({
-  // It will store the files in our local after that we will upload it to our cloudinary
   destination: function (req, file, cb) {
-    // cb is a callback
     cb(null, path.join(__dirname, "../public/images"));
   },
   filename: function (req, file, cb) {
@@ -35,7 +33,7 @@ const uploadPhoto = multer({
 });
 
 const productImageResize = async (req, res, next) => {
-  console.log('req.files in productImageResize fn', req.files);
+  console.log("req.files in productImageResize fn", req.files);
   if (!req.files) {
     return next();
   }
@@ -70,8 +68,5 @@ const blogImageResize = async (req, res, next) => {
 
 module.exports = { uploadPhoto, productImageResize, blogImageResize };
 
-// npm i multer sharp cloudinary
-// multer is used to handle our multi-part form data
-// Sharp-> sharp is used to like we can modify our images without like for example like we can change the dimensions and we can change the image format
-// and we can change our quality with the help of sharp
-// Cloudinary-> Cloudinary is a images and video management tool
+// Sharp-> sharp is used to like we can modify our images without like for example like we can change the dimensions and we can change the image
+// format and we can change our quality with the help of sharp

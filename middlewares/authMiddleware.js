@@ -13,10 +13,7 @@ const authMiddleware = asyncHandler(async (req, res, next) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         // console.log("decoded in authMiddleware", decoded);
         const user = await User.findById(decoded?.id);
-        // if(user.role == 'admin')
-        // console.log("req.user in authMiddleware", req.user);
         req.user = user;
-        // console.log("req.user in authMiddleware", req.user);
         next();
       }
     } catch (err) {

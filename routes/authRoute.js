@@ -4,12 +4,15 @@ const {
   createUser,
   loginUser,
   loginAdmin,
+  handleRefreshToken,
+  logOut,
   getAllUser,
   getUserById,
   deleteUser,
   updateUser,
   updatePassword,
   forgotPasswordToken,
+  resetPassword,
   getWishlist,
   saveAddress,
   addToUserCart,
@@ -25,6 +28,8 @@ const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
 router.post("/register", createUser);
 router.post("/login", loginUser);
 router.post("/loginAdmin", loginAdmin);
+router.get("/handleRefreshToken", handleRefreshToken);
+router.get("/logout", logOut);
 router.put("/update/edit-user", authMiddleware, updateUser);
 router.get("/allUser", getAllUser);
 router.get("/getWishlist", authMiddleware, getWishlist); // isko niche krne pe error aa rha
@@ -41,6 +46,7 @@ router.put("/password", authMiddleware, updatePassword); // Because of middlewar
 // ek warri ye check krna hai yha se middleware remove krke ki req.user me kya aa rha hai joki updatePassword controller me hai aur fir yha pe
 // lgana hai
 router.post("/forgot-password-token", forgotPasswordToken);
+router.post("/reset-password/:token", resetPassword);
 router.put("/saveAddress", authMiddleware, saveAddress);
 router.post("/cart", authMiddleware, addToUserCart);
 router.post("/cart/applyCoupon", authMiddleware, applyCoupon);
@@ -55,4 +61,3 @@ router.put(
 module.exports = router;
 
 // adddress nhi aa rha adrees wala dekhna hai
-// upload Image wala dekhna hai
