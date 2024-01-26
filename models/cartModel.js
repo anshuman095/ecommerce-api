@@ -16,6 +16,9 @@ var cartSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    finalAmount: {
+      type: Number,
+    },
   },
   {
     timestamps: true,

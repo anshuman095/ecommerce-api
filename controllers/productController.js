@@ -106,6 +106,23 @@ const getAllProducts = asyncHandler(async (req, res) => {
 });
 // ?fields=title,category
 
+const getAllProductss = asyncHandler(async (req, res) => {
+  try {
+    var query = {
+      price: {
+        $gt: parseInt(req.query.price["gt"]),
+        $lte: parseInt(req.query.price["lte"]),
+      },
+    };
+    let product = await Product.find(query);
+    res.status(200).json(product);
+  } catch (err) {
+    res.status(400).json({
+      message: err.message,
+    });
+  }
+});
+
 const getAllProducts1 = asyncHandler(async (req, res) => {
   try {
     const getAllProducts = await Product.find();
@@ -290,7 +307,6 @@ const rating = asyncHandler(async (req, res) => {
 });
 
 const uploadProductImages = asyncHandler(async (req, res) => {
-  console.log("req.files in uploadImages fn", req.files);
   const { id } = req.params;
   validateMongoDbId(id);
   try {
@@ -300,9 +316,7 @@ const uploadProductImages = asyncHandler(async (req, res) => {
     for (const file of files) {
       const { path } = file;
       const newPath = await uploader(path);
-      console.log("newPath in uploadImg fn", newPath);
       urls.push(newPath);
-      console.log('file in uploadProductImages fn', file);
       fs.unlinkSync(path);
     }
     const findProduct = await Product.findByIdAndUpdate(
@@ -323,6 +337,7 @@ const uploadProductImages = asyncHandler(async (req, res) => {
 module.exports = {
   createProduct,
   getAllProducts,
+  getAllProductss,
   getAllProducts1,
   getAllProductsByQuery,
   getAllProductsByQuery1,

@@ -1,6 +1,5 @@
-const mongoose = require("mongoose"); // Erase if already required
+const mongoose = require("mongoose");
 
-// Declare the Schema of the Mongo model
 var productSchema = new mongoose.Schema(
   {
     title: {
@@ -30,7 +29,6 @@ var productSchema = new mongoose.Schema(
     },
     brand: {
       type: String,
-      //   enum: ["Apple", "Samsung", "Lenevo"],
       required: true,
     },
     quantity: {
@@ -42,13 +40,9 @@ var productSchema = new mongoose.Schema(
       default: 0,
       // select: false, // By doing so user will not be able to see this sold field
     },
-    // images: {
-    //   type: Array,
-    // },
     images: [],
     color: {
       type: String,
-      //   enum: ["Black", "Brown", "Green"],
       required: true,
     },
     ratings: [
@@ -68,5 +62,4 @@ var productSchema = new mongoose.Schema(
   }
 );
 
-//Export the model
 module.exports = mongoose.model("Product", productSchema);

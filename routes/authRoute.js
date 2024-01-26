@@ -19,6 +19,7 @@ const {
   getUserCart,
   emptyCart,
   applyCoupon,
+  removeCoupon,
   createOrder,
   getOrders,
   updateOrderStatus,
@@ -42,7 +43,7 @@ router.get("/getOrders", authMiddleware, getOrders); // ye bhi niche nhi chl rha
 router.get("/:id", authMiddleware, isAdmin, getUserById);
 router.delete("/:id", deleteUser);
 router.put("/password", authMiddleware, updatePassword); // Because of middleware we are getting req.user and bcz of req.user we are getting id in
-// updatePassword function which is  inside userController
+// updatePassword function which is inside userController
 // ek warri ye check krna hai yha se middleware remove krke ki req.user me kya aa rha hai joki updatePassword controller me hai aur fir yha pe
 // lgana hai
 router.post("/forgot-password-token", forgotPasswordToken);
@@ -50,6 +51,7 @@ router.post("/reset-password/:token", resetPassword);
 router.put("/saveAddress", authMiddleware, saveAddress);
 router.post("/cart", authMiddleware, addToUserCart);
 router.post("/cart/applyCoupon", authMiddleware, applyCoupon);
+router.post("/cart/removeCoupon", authMiddleware, removeCoupon);
 router.post("/cart/cashOrder", authMiddleware, createOrder);
 router.put(
   "/order/updateOrderStatus/:id",

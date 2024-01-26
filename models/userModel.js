@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
-const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 
 var userSchema = new mongoose.Schema(
@@ -51,6 +50,9 @@ var userSchema = new mongoose.Schema(
         ref: "Product",
       },
     ],
+    couponApplied: {
+      type: Boolean,
+    },
   },
   {
     timestamps: true,
