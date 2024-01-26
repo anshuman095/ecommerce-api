@@ -358,12 +358,48 @@ const getUserCart = asyncHandler(async (req, res) => {
 });
 
 const emptyCart = asyncHandler(async (req, res) => {
+  const { type, productId } = req.body;
   const { _id } = req.user;
   validateMongoDbId(_id);
   try {
-    const removedCart = await Cart.findOneAndDelete({ orderBy: _id });
-    await User.findByIdAndUpdate(_id, { cart: [] }, { new: true });
-    res.json(removedCart);
+    const cart = await Cart.findOne({ orderBy: _id });
+    let removed = {};
+    if (type === "remove_from_cart") {
+      const removedCart = await Cart.findOneAndDelete({ orderBy: _id });
+      removed = removedCart;
+      await User.findByIdAndUpdate(_id, { cart: [] }, { new: true });
+      res.json(removed);
+    } else if (type === "decrease_from_cart") {
+      const productIndex = cart.products.findIndex((items) => {
+        return items.product.toString() === productId;
+      });
+      if (productIndex !== -1) {
+        const product = cart.products[productIndex];
+        if (product.count > 1) {
+          cart.products[productIndex].count -= 1;
+          cart.cartTotal -= product.price;
+          await User.findByIdAndUpdate(
+            _id,
+            {
+              $set: { "cart.$[elem].count": cart.products[productIndex].count },
+            },
+            { arrayFilters: [{ "elem.product": productId }], new: true }
+          );
+        } else {
+          cart.products.splice(productIndex, 1);
+          cart.cartTotal -= product.price;
+          await User.findByIdAndUpdate(
+            _id,
+            {
+              $pull: { cart: { product: productId } },
+            },
+            { new: true }
+          );
+        }
+        await cart.save();
+        res.json(cart);
+      }
+    }
   } catch (err) {
     throw new Error(err);
   }

@@ -67,6 +67,3 @@ const blogImageResize = async (req, res, next) => {
 };
 
 module.exports = { uploadPhoto, productImageResize, blogImageResize };
-
-// Sharp-> sharp is used to like we can modify our images without like for example like we can change the dimensions and we can change the image
-// format and we can change our quality with the help of sharp
