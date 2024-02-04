@@ -1,8 +1,9 @@
 const port = process.env.PORT || 4000;
 const express = require("express");
 const app = express();
-const dbConnect = require("./config/dbConnect");
+const bodyParser = require("body-parser");
 const dotenv = require("dotenv").config();
+const dbConnect = require("./config/dbConnect");
 const authRouter = require("./routes/authRoute");
 const productRouter = require("./routes/productRoute");
 const blogRouter = require("./routes/blogRoute");
@@ -16,12 +17,15 @@ const morgan = require("morgan");
 
 dbConnect();
 
-app.use(morgan("dev")); // Not so imp
+app.use(morgan("dev"));
 app.use(
   express.json({
     extended: true,
   })
 );
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+
 app.use("/api/user", authRouter);
 app.use("/api/product", productRouter);
 app.use("/api/blog", blogRouter);
@@ -36,7 +40,3 @@ app.use(errorHandler);
 app.listen(port, () => {
   console.log(`Server is listening at ${port}`);
 });
-
-// const bodyParser = require("body-parser");
-// app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({ extended: false }));

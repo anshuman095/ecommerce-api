@@ -37,7 +37,6 @@ const loginUser = asyncHandler(async (req, res) => {
   if (findUser && (await findUser.isPasswordMatched(password))) {
     const refreshToken = generateRefreshToken(findUser._id);
     console.log("refreshToken", refreshToken);
-    console.log("findUser._id", findUser._id);
     const user = await User.findByIdAndUpdate(
       findUser._id,
       {
@@ -120,7 +119,6 @@ const logOut = asyncHandler(async (req, res) => {
 });
 
 const updateUser = asyncHandler(async (req, res) => {
-  // const { id } = req.params;
   const { _id } = req.user;
 
   const user = await User.findById(_id);
@@ -147,7 +145,6 @@ const getAllUser = asyncHandler(async (req, res) => {
 
 const getUserById = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  // console.log(id);
   try {
     const getUser = await User.findById(id);
     res.json(getUser);
@@ -158,7 +155,6 @@ const getUserById = asyncHandler(async (req, res) => {
 
 const deleteUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  // console.log(id);
   try {
     const deletedUser = await User.findByIdAndDelete(id);
     res.json(deletedUser);
@@ -178,7 +174,7 @@ const updatePassword = asyncHandler(async (req, res) => {
     if (passwordMatch) {
       if (new_password === confirm_new_password) {
         const salt = bcrypt.genSalt(10);
-        let new_generated_password = await bcrypt.hash(new_password, salt);
+        let new_generated_password = bcrypt.hash(new_password, salt);
         await User.findByIdAndUpdate(
           user._id,
           { password: new_generated_password },
@@ -559,7 +555,6 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
       throw new Error("Order not found");
     }
     const { paymentIntent } = existingOrder;
-    console.log("paymentIntent in updateOrderStatus function", paymentIntent);
     const updateOrderStats = await Order.findByIdAndUpdate(
       id,
       {

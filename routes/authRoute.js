@@ -33,19 +33,13 @@ router.get("/handleRefreshToken", handleRefreshToken);
 router.get("/logout", logOut);
 router.put("/update/edit-user", authMiddleware, updateUser);
 router.get("/allUser", getAllUser);
-router.get("/getWishlist", authMiddleware, getWishlist); // isko niche krne pe error aa rha
-router.get("/getUserCart", authMiddleware, getUserCart); // isko niche likhne pe error aa rha you are not an admin but iss route ko upr laya to
-// mujhe cart dikh rha
-router.delete("/emptyCart", authMiddleware, emptyCart); // // isko niche likhne pe error aa rha saying ->
-// "CastError: Cast to ObjectId failed for value \"emptyCart\" (type string) at path \"_id\" for model \"User\"" but iss route ko upr laya to mujhe
-// cart dikh rha
-router.get("/getOrders", authMiddleware, getOrders); // ye bhi niche nhi chl rha error saying you are not an admin
+router.get("/getWishlist", authMiddleware, getWishlist);
+router.get("/getUserCart", authMiddleware, getUserCart);
+router.delete("/emptyCart", authMiddleware, emptyCart);
+router.get("/getOrders", authMiddleware, getOrders);
 router.get("/:id", authMiddleware, isAdmin, getUserById);
 router.delete("/:id", deleteUser);
-router.put("/password", authMiddleware, updatePassword); // Because of middleware we are getting req.user and bcz of req.user we are getting id in
-// updatePassword function which is inside userController
-// ek warri ye check krna hai yha se middleware remove krke ki req.user me kya aa rha hai joki updatePassword controller me hai aur fir yha pe
-// lgana hai
+router.put("/password", authMiddleware, updatePassword);
 router.post("/forgot-password-token", forgotPasswordToken);
 router.post("/reset-password/:token", resetPassword);
 router.put("/saveAddress", authMiddleware, saveAddress);
@@ -61,5 +55,3 @@ router.put(
 );
 
 module.exports = router;
-
-// adddress nhi aa rha adrees wala dekhna hai

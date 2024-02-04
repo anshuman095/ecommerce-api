@@ -106,9 +106,48 @@ const getAllProducts = asyncHandler(async (req, res) => {
 });
 // ?fields=title,category
 
+// const getAllProductss = asyncHandler(async (req, res) => {
+//   try {
+//     let query = {};
+//     if (req.query.price && req.query.price.gt && req.query.price.lte) {
+//       query.price = {
+//         $gt: parseInt(req.query.price.gt),
+//         $lte: parseInt(req.query.price.lte),
+//       };
+//     }
+//     // var query = {
+//     //   price: {
+//     //     $gt: parseInt(req.query.price["gt"]),
+//     //     $lte: parseInt(req.query.price["lte"]),
+//     //   },
+//     // };
+//     console.log("req.query->", req.query);
+//     if (req.query.sort) {
+//       // const sortBy = req.query.sort.split(",").join(" ");
+//       // console.log("sortBy", sortBy);
+//       // query = query.sort(sortBy);
+//       const sortBy = await req.query.sort.split(",");
+//       // query.sort = await sortBy.join(" ");
+//       query.sort = sortBy;
+//       console.log("query in here", query);
+//     }
+//     if (req.query.fields) {
+//       const fields = req.query.fields.split(",").join(" ");
+//       query = query.select(fields);
+//     }
+//     let product = await Product.find(query);
+//     res.status(200).json(product);
+//   } catch (err) {
+//     res.status(400).json({
+//       message: err.message,
+//     });
+//   }
+// });
+
 const getAllProductss = asyncHandler(async (req, res) => {
-  try {
-    var query = {
+  let query = {};
+  if (req.query.price && req.query.price.gt && req.query.price.lte) {
+    query = {
       price: {
         $gt: parseInt(req.query.price["gt"]),
         $lte: parseInt(req.query.price["lte"]),
@@ -116,12 +155,53 @@ const getAllProductss = asyncHandler(async (req, res) => {
     };
     let product = await Product.find(query);
     res.status(200).json(product);
-  } catch (err) {
-    res.status(400).json({
-      message: err.message,
-    });
   }
+  console.log("query after price gt and lt", query);
+  // console.log("req.query.sort", req.query.sort);
+  if (req.query?.sort) {
+    const sortBy = req.query.sort.split(",");
+    console.log("sortBy", sortBy);
+    // query = query.sort(sortBy); // I can not use like this sort fn on query object
+    query = await Product.find(query).sort(sortBy.join(" "));
+    res.status(200).json(query);
+  } else {
+    query = await Product.find(query);
+  }
+
+  if (req.query.fields) {
+    let field = req.query.fields.split(",").join(" ");
+    console.log("query in field", query);
+    query = await query.select(field);
+  }
+  console.log("query after if", query);
+
+  const page = req.query.page;
+  const limit = req.query.limit;
+  const skip = (page - 1) * limit;
+
+  // query = query.skip(skip).limit(limit);
+  // console.log("query after skip", query);
+
+  if (req.query.page) {
+    const allProductsInDb = await Product.countDocuments();
+    if (skip >= allProductsInDb) {
+      throw new Error(`Page does not exist`);
+    }
+  }
+
+  // try {
+  //   // let product = await Product.find(query);
+  //   console.log("query 11", query);
+  //   let product = await query.exec();
+  //   console.log("query 22", query);
+  //   // res.json(product);
+  // } catch (err) {
+  //   throw new Error(err);
+  // }
 });
+// http://localhost:4000/api/product/getAllProductss?price[gt]=500&price[lte]=1000
+// http://localhost:4000/api/product/getAllProductss?sort=category,brand
+// http://localhost:4000/api/product/getAllProductss?fields=title,price,category
 
 const getAllProducts1 = asyncHandler(async (req, res) => {
   try {
