@@ -4,7 +4,6 @@ const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
 const {
   createProduct,
   getAllProducts,
-  getAllProductss,
   getAllProducts1,
   getAllProductsByQuery,
   getAllProductsByQuery1,
@@ -22,7 +21,6 @@ const {
 
 router.post("/createProduct", authMiddleware, isAdmin, createProduct);
 router.get("/getAllProducts", getAllProducts);
-router.get("/getAllProductss", getAllProductss);
 router.get("/getAllProducts1", getAllProducts1);
 router.get("/getAllProductsByQuery", getAllProductsByQuery);
 router.get("/getAllProductsByQuery1", getAllProductsByQuery1);

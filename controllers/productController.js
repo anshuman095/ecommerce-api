@@ -19,132 +19,6 @@ const createProduct = asyncHandler(async (req, res) => {
 });
 
 const getAllProducts = asyncHandler(async (req, res) => {
-  try {
-    // filtering
-    const queryObj = { ...req.query };
-    const excludeFields = ["page", "sort", "limit", "fields"]; // ye smjhna hai abi
-    excludeFields.forEach((el) => delete queryObj[el]); // ye smjhna hai abi
-    console.log(
-      "req.query in getAllProducts",
-      req.query,
-      "-----------",
-      "queryObj in getAllProducts",
-      queryObj
-    );
-    // Output req.query in getAllProducts { category: 'Phone', sort: 'price' } ----------- queryObj in getAllProducts { category: 'Phone' }
-    // const getAllProducts = await Product.find();
-    let queryStr = JSON.stringify(queryObj);
-    console.log("queryStr in getAllProducts", queryStr);
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`); // ye smjhna hai abi
-    console.log("queryStr after parse", JSON.parse(queryStr));
-    // const getAllProducts = await Product.find(queryObj);
-    // let query = await Product.find(JSON.parse(queryStr));
-    const queryObjParsed = JSON.parse(queryStr);
-    let query = Product.find(queryObjParsed);
-    // http://localhost:4000/api/product/getAllProducts?price[gt]=500&price[lte]=1000
-
-    // Sorting
-    if (req.query.sort) {
-      const sortBy = req.query.sort.split(",").join(" "); // ye smjhna hai abi  .split aur .join ke bina bhi kaam kr rha hai
-      console.log("sortBy", sortBy);
-      query = query.sort(sortBy); // yha pe basically me aise dunga query category brand
-      // http://localhost:4000/api/product/getAllProducts?sort=category,brand
-      // sara data aa jayega kuki sbhi me category brand hai line no.47 se
-      // http://localhost:4000/api/product/getAllProducts?sort=-category
-      // iss line se category descending order me ayegi aur ye line no.49 se aa rhi hai aur line no.49 wali query ka else wale part se koi mtlb
-      // nhi hai agr else wala nhi likhe aur line no.49 wali query likhe fir bhi data descending order me hi ayega
-      // http://localhost:4000/api/product/getAllProducts?sort=-category,-brand
-      // 52 wali line se to data descending me ayega but phle category priority fir uss category ke andr brand ki descending order me sorting hogi
-    }
-    // else {
-    //   query = query.sort("-createdAt"); // iss line se data jo sbse last me create hua hai vo sbse phle dikhega
-    // }
-
-    // limiting the fields
-    // http://localhost:4000/api/product/getAllProducts?fields=title,price,category
-    // line no.59 se sirf vhi fields dikhenge jo maine query me diya hai
-    if (req.query.fields) {
-      const fields = req.query.fields.split(",").join(" ");
-      query = query.select(fields);
-    } else {
-      query = query.select("-__v"); // - krne se __v wali fields nhi dikhegi agr mai simple ye line no.66 execute krta hu postman se
-      // http://localhost:4000/api/product/getAllProducts
-      // http://localhost:4000/api/product/getAllProducts?fields=-title,-price,-category
-      // agr 67 wali line execute krunga to fir title, price aur category field bhi output me nhi dikhenge
-    }
-
-    // pagination
-    const page = req.query.page;
-    const limit = req.query.limit;
-    const skip = (page - 1) * limit;
-    console.log(
-      "page -->",
-      page,
-      "------",
-      "limit -->",
-      limit,
-      "-----",
-      "skip -->",
-      skip
-    );
-    query = query.skip(skip).limit(limit);
-    if (req.query.page) {
-      const allProductsCount = await Product.countDocuments();
-      console.log(allProductsCount);
-      if (skip >= allProductsCount) {
-        throw new Error(`This page does not exists`);
-      }
-    }
-    const product = await query;
-
-    res.json(product);
-  } catch (err) {
-    res.json({
-      message: err.message,
-    });
-  }
-});
-// ?fields=title,category
-
-// const getAllProductss = asyncHandler(async (req, res) => {
-//   try {
-//     let query = {};
-//     if (req.query.price && req.query.price.gt && req.query.price.lte) {
-//       query.price = {
-//         $gt: parseInt(req.query.price.gt),
-//         $lte: parseInt(req.query.price.lte),
-//       };
-//     }
-//     // var query = {
-//     //   price: {
-//     //     $gt: parseInt(req.query.price["gt"]),
-//     //     $lte: parseInt(req.query.price["lte"]),
-//     //   },
-//     // };
-//     console.log("req.query->", req.query);
-//     if (req.query.sort) {
-//       // const sortBy = req.query.sort.split(",").join(" ");
-//       // console.log("sortBy", sortBy);
-//       // query = query.sort(sortBy);
-//       const sortBy = await req.query.sort.split(",");
-//       // query.sort = await sortBy.join(" ");
-//       query.sort = sortBy;
-//       console.log("query in here", query);
-//     }
-//     if (req.query.fields) {
-//       const fields = req.query.fields.split(",").join(" ");
-//       query = query.select(fields);
-//     }
-//     let product = await Product.find(query);
-//     res.status(200).json(product);
-//   } catch (err) {
-//     res.status(400).json({
-//       message: err.message,
-//     });
-//   }
-// });
-
-const getAllProductss = asyncHandler(async (req, res) => {
   let query = {};
   if (req.query.price && req.query.price.gt && req.query.price.lte) {
     query = {
@@ -155,53 +29,37 @@ const getAllProductss = asyncHandler(async (req, res) => {
     };
     let product = await Product.find(query);
     res.status(200).json(product);
-  }
-  console.log("query after price gt and lt", query);
-  // console.log("req.query.sort", req.query.sort);
-  if (req.query?.sort) {
-    const sortBy = req.query.sort.split(",");
-    console.log("sortBy", sortBy);
-    // query = query.sort(sortBy); // I can not use like this sort fn on query object
-    query = await Product.find(query).sort(sortBy.join(" "));
+  } else if (req.query?.sort) {
+    const sortBy = req.query.sort.split(",").join(" ");
+    query = await Product.find({}, sortBy);
+    res.status(200).json(query);
+  } else if (req.query.fields) {
+    let field = req.query.fields.split(",");
+    query = await Product.find({}, field);
     res.status(200).json(query);
   } else {
-    query = await Product.find(query);
-  }
-
-  if (req.query.fields) {
-    let field = req.query.fields.split(",").join(" ");
-    console.log("query in field", query);
-    query = await query.select(field);
-  }
-  console.log("query after if", query);
-
-  const page = req.query.page;
-  const limit = req.query.limit;
-  const skip = (page - 1) * limit;
-
-  // query = query.skip(skip).limit(limit);
-  // console.log("query after skip", query);
-
-  if (req.query.page) {
-    const allProductsInDb = await Product.countDocuments();
-    if (skip >= allProductsInDb) {
-      throw new Error(`Page does not exist`);
+    const page = req.query.page;
+    const limit = req.query.limit;
+    const skip = (page - 1) * limit;
+    if (req.query.page) {
+      const allProductsInDb = await Product.countDocuments();
+      if (skip >= allProductsInDb) {
+        throw new Error(`Page does not exist`);
+      }
     }
+    query = await Product.find().skip(skip).limit(limit);
+    res.status(200).json(query);
   }
-
-  // try {
-  //   // let product = await Product.find(query);
-  //   console.log("query 11", query);
-  //   let product = await query.exec();
-  //   console.log("query 22", query);
-  //   // res.json(product);
-  // } catch (err) {
-  //   throw new Error(err);
+  // else {
+  //   query = query.sort("-createdAt"); // iss line se data jo sbse last me create hua hai vo sbse phle dikhega
   // }
 });
-// http://localhost:4000/api/product/getAllProductss?price[gt]=500&price[lte]=1000
-// http://localhost:4000/api/product/getAllProductss?sort=category,brand
-// http://localhost:4000/api/product/getAllProductss?fields=title,price,category
+// http://localhost:4000/api/product/getAllProducts?price[gt]=500&price[lte]=1000
+// http://localhost:4000/api/product/getAllProducts?sort=category,brand
+// http://localhost:4000/api/product/getAllProducts?sort=-category
+// http://localhost:4000/api/product/getAllProducts?sort=-category,-brand
+// http://localhost:4000/api/product/getAllProducts?fields=title,price,category
+// http://localhost:4000/api/product/getAllProducts?page=6&limit=3
 
 const getAllProducts1 = asyncHandler(async (req, res) => {
   try {
@@ -280,7 +138,6 @@ const updateProduct = asyncHandler(async (req, res) => {
 
 const deleteProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  console.log("Id in deleteProduct", id);
   try {
     const deletedProduct = await Product.findOneAndDelete({ _id: id });
     if (!deletedProduct) {
@@ -334,7 +191,6 @@ const addToWishlist = asyncHandler(async (req, res) => {
   }
 });
 
-// login user which I will get from req.user
 const rating = asyncHandler(async (req, res) => {
   const { _id } = req.user;
   const { star, comment, productId } = req.body;
@@ -417,7 +273,6 @@ const uploadProductImages = asyncHandler(async (req, res) => {
 module.exports = {
   createProduct,
   getAllProducts,
-  getAllProductss,
   getAllProducts1,
   getAllProductsByQuery,
   getAllProductsByQuery1,
