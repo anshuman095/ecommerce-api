@@ -73,7 +73,6 @@ const getAllProducts1 = asyncHandler(async (req, res) => {
 });
 
 const getAllProductsByQuery = asyncHandler(async (req, res) => {
-  console.log("req.query in getAllProductsByQuery", req.query);
   try {
     const getAllProducts = await Product.find(req.query);
     res.json(getAllProducts);
@@ -85,7 +84,6 @@ const getAllProductsByQuery = asyncHandler(async (req, res) => {
 });
 
 const getAllProductsByQuery1 = asyncHandler(async (req, res) => {
-  console.log("req.query in getAllProductsByQuery1", req.query);
   try {
     const getAllProducts = await Product.find({
       brand: req.query.brand,
@@ -156,18 +154,10 @@ const addToWishlist = asyncHandler(async (req, res) => {
   const { productId } = req.body;
   try {
     const user = await User.findById(_id);
-    console.log("user in addToWishlist fn", user);
     const alreadyAdded = user.wishlist.find((id) => {
-      // id me vo id ayegi jo id mai postman ki body se send kr rha hu
-      // in short userModel me wishlist ke andr jo hai vhi id me ayega
-      console.log("id in find fn of addToWishlist", id); // ye console nhi aa rha jb koi id nhi hai mujhe ye smjhna hai agr id nhi hai fir bhi
-      // atleast console me undefined aa jata but ye poora console nhi print hua phli baar jb koi id nhi hai aur agr ek id present hai to fir iss
-      // console print ho rha
       return id.toString() === productId;
     });
-    console.log("alreadyAdded outside if condition", alreadyAdded);
     if (alreadyAdded) {
-      console.log("alreadyAdded in if condition", alreadyAdded);
       let user = await User.findByIdAndUpdate(
         _id,
         {
@@ -197,14 +187,9 @@ const rating = asyncHandler(async (req, res) => {
   try {
     const product = await Product.findById(productId);
     let alreadyRated = product.ratings.find((userId) => {
-      // In userId we will get star and postedBy which is inside productModel ratings
-      // in short ratings ke andr jo productModel me hai vhi userId me ayega
-      console.log("userId in product.ratings.find", userId);
       return userId.postedBy.toString() === _id.toString();
     });
-    console.log("alreadyRatd outside if condition", alreadyRated);
     if (alreadyRated) {
-      console.log("alreadyRatd in if condition", alreadyRated);
       const updateRating = await Product.updateOne(
         {
           ratings: { $elemMatch: alreadyRated },

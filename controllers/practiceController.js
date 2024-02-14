@@ -13,9 +13,7 @@ const updatePractice = asyncHandler(async (req, res) => {
 
 const uploadVideoController = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  console.log("id", id);
   const file = req.files;
-  console.log("file in uoploadVideo function", file);
 
   var videoUrlList = [];
 
@@ -24,7 +22,6 @@ const uploadVideoController = asyncHandler(async (req, res) => {
     var result = await uploads(locaFilePath);
     videoUrlList.push(result.url);
   }
-  console.log("videoUrlList", videoUrlList);
   const video = await Practice.findByIdAndUpdate(
     id,
     {
@@ -32,7 +29,6 @@ const uploadVideoController = asyncHandler(async (req, res) => {
     },
     { new: true }
   );
-  console.log("video", video);
 
   return res.status(200).send(video);
 });

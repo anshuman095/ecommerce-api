@@ -19,15 +19,9 @@ const createBlog = asyncHandler(async (req, res) => {
 const updateBlog = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
-    console.log("id in updateBlog fn", id);
     const updatedBlog = await Blog.findByIdAndUpdate(id, req.body, {
       new: true,
     });
-    // const updatedBlog = await Blog.findByIdAndUpdate(id);  // aisa krne se sirf aur sirf phla like title hi change ho rha sirf baki sare
-    // description and catgory nhi ho rhe change aisa ku
-    // agr mai req.body aur { new:true } na likhu fir bhi update ho rha but sirf ek hi update ho rha aur agr mai req.body likhu aur {new: true} na
-    // kru to update nhi hoga
-    console.log("updatedBlog in updateBlog fn", updatedBlog);
     res.json(updatedBlog);
   } catch (err) {
     throw new Error(err);
@@ -37,7 +31,6 @@ const updateBlog = asyncHandler(async (req, res) => {
 const getBlog = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
-    // const blog = await Blog.findById(id).populate("likes").populate("disLikes"); // utube me ye line add krke yha pe populate kiya hai
     const updatedViews = await Blog.findByIdAndUpdate(
       id,
       { $inc: { numOfViews: 1 } },
@@ -75,23 +68,14 @@ const deleteBlog = asyncHandler(async (req, res) => {
 const likeBlog = asyncHandler(async (req, res) => {
   const { blogId } = req.body;
   validateMongoDbId(blogId);
-  // Find the blog which you want to be liked
   const blog = await Blog.findById(blogId);
-  // find the login user
   const loginUserId = req?.user?._id;
-  // find if the user has liked the blog
   const isLiked = blog?.isLiked;
   // find if the user has disliked the blog
-  //   console.log("blog?.dislikes in likeBlog fn", blog?.dislikes);
   //   const alreadyDisliked = blog?.dislikes?.find((userId) => {
-  //     console.log("userId in likeBlog find fn", userId);
   //     userId?.toString() === loginUserId?.toString();
   //   });
-  //   console.log("alreadyDisliked in likeBlog fn", alreadyDisliked);
   //   if (alreadyDisliked) {
-  //     console.log(
-  //       "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
-  //     );
   //     const blog = await Blog.findByIdAndUpdate(
   //       blogId,
   //       {
@@ -102,7 +86,6 @@ const likeBlog = asyncHandler(async (req, res) => {
   //     );
   //     res.json(blog);
   //   }
-  // ye line no.82 se 101 tk comment krne pe bhi shi chl rha hai
   if (isLiked) {
     const blog = await Blog.findByIdAndUpdate(
       blogId,
@@ -131,18 +114,12 @@ const dislikeBlog = asyncHandler(async (req, res) => {
   validateMongoDbId(blogId);
   // Find the blog which you want to be liked
   const blog = await Blog.findById(blogId);
-  // find the login user
   const loginUserId = req?.user?._id;
-  // find if the user has liked the blog
   const isDisLiked = blog?.isDisliked;
-  // find if the user has disliked the blog
   //   const alreadyLiked = blog?.likes?.find(
   //     (userId) => userId?.toString() === loginUserId?.toString()
   //   );
   //   if (alreadyLiked) {
-  //     console.log(
-  //       "22222222222222222222222222222222222222222222222222222222222222222222222222222"
-  //     );
   //     const blog = await Blog.findByIdAndUpdate(
   //       blogId,
   //       {
@@ -177,7 +154,6 @@ const dislikeBlog = asyncHandler(async (req, res) => {
 });
 
 const uploadBlogImages = asyncHandler(async (req, res) => {
-  console.log("req.files in uploadImages fn", req.files);
   const { id } = req.params;
   validateMongoDbId(id);
   try {
@@ -187,9 +163,7 @@ const uploadBlogImages = asyncHandler(async (req, res) => {
     for (const file of files) {
       const { path } = file;
       const newPath = await uploader(path);
-      console.log("newPath in uploadImg fn", newPath);
       urls.push(newPath);
-      console.log("file in uploadBlogImages fn", file);
       fs.unlinkSync(path);
     }
     const findBlog = await Blog.findByIdAndUpdate(
@@ -222,10 +196,7 @@ module.exports = {
 //     try {
 //       const { blogId } = req.body;
 //       const blog = await Blog.findById(blogId);
-//       const loginUserId = req.user._id; // only login user can like and dislike the blog // how youl'll get if the user is logged in or not so
-//       // with the help of auuthMiddleware
-//       console.log(`loginUserId in likeBlog fn`, loginUserId);
-//       console.log("blog.isLiked in likeBlog fn", blog.isLiked);
+//       const loginUserId = req.user._id;
 //       if (blog.isLiked === false) {
 //         blog.isLiked = true;
 //         blog.likes.push(loginUserId);
